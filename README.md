@@ -1,10 +1,10 @@
 # Automatic_vectorization_Lausanne
 semester project repository of EPFL in DHLAB.
 
-## reposiory Menu
+## Repository Menu
 
-training: folder of semantic segmentation (chapter 3 of the report)
-polygon_recovery: folder of polygon recovery (chapter 4 of the report)
+training: folder of semantic segmentation (chapter 3 of the report) \
+polygon_recovery: folder of polygon recovery (chapter 4 of the report) \
 report: folder to save reports and LaTeX sources.
 
 ## Semantic segmentation
