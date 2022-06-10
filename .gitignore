@@ -1,0 +1,13 @@
+training/data
+training/predictions
+training/result*
+training/*.zip
+models
+tensorboard
+historical_model
+polygon_recovery/original
+polygon_recovery/additional
+polygon_recovery/trytry
+polygon_recovery/prediction_classes
+polygon_recovery/*.zip
+.vscode
