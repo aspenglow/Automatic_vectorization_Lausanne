@@ -20,14 +20,14 @@
 \setcounter{page}{1}
 
 \section{Introduction}
-Historical cadastral maps are an indispensable source for studying evolution of our cities. We have a "renovated cadastre" which consists of more than 300 plates with high quality and accuracy and two copies are well-preserved today and have been well-scanned. Transforming these cadastres into vector maps can help researchers better utilize them with higher efficiency and also prevent these precious historical documents from being damaged and lost. In this automatic vectorization project, we found a method to transform those well-scanned historical cadastre maps into polygon-segmented images with automatically computer vision methods. 
+Historical cadastral maps are an indispensable source for studying the evolution of our cities. We have a "renovated cadastre" which consists of more than 300 plates with high quality and accuracy and two copies are well-preserved today and have been well-scanned. Transforming these cadastres into vector maps can help researchers better utilize them with higher efficiency and also prevent these precious historical documents from being damaged and lost. In this automatic vectorization project, we found a method to transform those well-scanned historical cadastre maps into polygon-segmented images with automatic computer vision methods.
 
-We first present semantic segmentation with a convolutional neural network (CNN) model to detect all the edges and boundaries of objects that we have interest in these cadastres, and then we use computer vision method to recover all the polygons by segmenting regions from the CNN prediction outputs and finally get polygon-segmented images. In the future researchers can utilize these polygon recovery results and transform them to vector images by just manual-labelling with particular software.
+We first present semantic segmentation with a convolutional neural network (CNN) model to detect all the edges and boundaries of objects in these cadastres, and then we use the computer vision method to recover all the polygons by segmenting regions from the CNN prediction outputs and finally get polygon-segmented images. In the future researchers can utilize these polygon recovery results and transform them into vector images by just manual labeling with particular software.
 
 \section{Data annotation}
 
 \subsection{Dataset}
-The renovated cadastre was measured and drawn by Deluz in 1888, which consists of more than 300 historical maps of Lausanne with similar scale ratio from 1:500 to 1:2000. We decided to use 24 of these cadastre maps to explore automatic method for image vectorization. 13 of the maps have a scale comprised at 1:500 and 9 maps with scale ratio 1:1000 and the remaining 2 map with scale ratio 1:2000. An example of the cadastre is showed in Figure \ref{fig:cadaster-preprocessing} (a), which depicted a region of city of historical Lausanne.   
+The renovated cadastre was measured and drawn by Deluz in 1888, which consists of more than 300 historical maps of Lausanne with similar scale ratios from 1:500 to 1:2000. We decided to use 24 of these cadastre maps to explore automatic methods for image vectorization. 13 of the maps have a scale comprised of 1:500 and 9 maps with a scale ratio of 1:1000 and the remaining 2 maps with a scale ratio of 1:2000. An example of the cadastre is shown in Figure \ref{fig:cadaster-preprocessing} (a), which depicted a region of city of historical Lausanne.   
 \begin{figure}[H]
 	\begin{subfigure}[b]{.66\textwidth}
 		% include first image
@@ -48,14 +48,14 @@ The renovated cadastre was measured and drawn by Deluz in 1888, which consists o
 	\label{fig:cadaster-preprocessing}
 \end{figure}
 
-We found that, for all of those scanned cadastre pages, they consist of map images in the right parts, and the left parts are just some text descriptions and forms that are not interested in this map processing project, and there are also black backgrounds at the boundary of these cadastre images. so we can just retain the map part and cut out the black edges and the left part of these cadastre images. Figure \ref{fig:cadaster-preprocessing} (b) showed the map image after cropping, and our project was carried out based on those cropped maps. 
+We found that, all of those scanned cadastre pages consist of map images in the right parts, and the left parts are just some text descriptions and forms that are not interested in this map processing project, and there are also black backgrounds at the boundary of these cadastre images. so we can just retain the map part and cut out the black edges and the left part of these cadastre images. Figure \ref{fig:cadaster-preprocessing} (b) showed the map image after cropping, and our project was carried out based on those cropped maps. 
 \subsection{Annotation}
 
-Every cadastre map described road networks, buildings, rivers, fountains and other cartographic contents of part of the Lausanne. We call those map elements mentioned above as "edge", and the aim of the data annotation is to label all the "edges" in each cadastre maps and generate a binary edge image for each map for model training in semantic segmentation process.
+Every cadastre map described road networks, buildings, rivers, fountains, and other cartographic contents of part of the Lausanne. We call those map elements mentioned above "edge", and the aim of the data annotation is to label all the "edges" in each cadastre map and generate a binary edge image for each map for model training in the semantic segmentation process.
  
-Since annotation is a greatly boring and time-consuming work since we need to judge every detail of the map and annotate with very high accuracy and also considered the limited time and human resources, we selected 12 of those 24 maps to make the annotation work, containing 3 of them described part of the urban area of Lausanne with high density of buildings and road networks, 6 of them shows part of countryside regions, and the last 3 maps contains just some rivers and roads with very few buildings.
+Since annotation is a greatly boring and time-consuming work since we need to judge every detail of the map and annotate with very high accuracy and also considering the limited time and human resources, we selected 12 of those 24 maps to make the annotation work, containing 3 of them described part of the urban area of Lausanne with a high density of buildings and road networks, 6 of them shows part of countryside regions, and the last 3 maps contain just some rivers and roads with very few buildings.
 
-The annotation process was done with a raster-based software called "GNU Image Manipulation Program". We annotated class "edge" with 6-pixels-wide lines. Figure \ref{fig:anno_res} shows the patches of original maps and their corresponding annotation results. We can see that these maps consists of different colours of lines. Black lines (solid and dotted) (Figure \ref{fig:anno_res} 2.(a)) are road networks, red lines are building edges and walls and other human-made barriers, and a few of blue lines exist which are railway networks (Figure \ref{fig:anno_res} 1.(c)). 
+The annotation process was done with a raster-based software called "GNU Image Manipulation Program". We annotated class "edge" with 6-pixels-wide lines. Figure \ref{fig:anno_res} shows the patches of original maps and their corresponding annotation results. We can see that these maps consist of different colors of lines. Black lines (solid and dotted) (Figure \ref{fig:anno_res} 2. (a)) are road networks, red lines are building edges and walls and other human-made barriers, and a few blue lines exist which are railway networks (Figure \ref{fig:anno_res} 1. (c)). 
 
 
 
@@ -131,9 +131,9 @@ The annotation process was done with a raster-based software called "GNU Image M
     \label{fig:anno_res}
 \end{figure}
 
-We should notice that there are also some perpendicular thin straight lines throughout the whole map, which are just geometrical lines were not interested and thus we should not annotated them, and some text descriptions are contained in these maps (Figure \ref{fig:anno_res} 1.(d)) and some of them are even overlapped with road networks and buildings and thus could bring difficulty in annotating and result in prediction error in the semantic segmentation task, and we should keep labeling straight lines and ignore these texts during annotation (Figure \ref{fig:anno_res} 2.(d)). There are also some stairs near or in the buildings with some dense parallel lines and considering that annotating them will split a lot of little polygons which is not needed in the polygon recovery task, we decided to ignore those stairs during annotation (Figure \ref{fig:anno_res} 1-2.(b)).
+We should notice that there are also some perpendicular thin straight lines throughout the whole map, which are just geometrical lines that were not interested thus we should not annotate them, and some text descriptions are contained in these maps (Figure \ref{fig:anno_res} 1. (d)) and some of them are even overlapped with road networks and buildings and thus could bring difficulty in annotating and result in prediction error in the semantic segmentation task, and we should keep labeling straight lines and ignore these texts during annotation (Figure \ref{fig:anno_res} 2. (d)). There are also some stairs near or in the buildings with some dense parallel lines and considering that annotating them will split a lot of little polygons which is not needed in the polygon recovery task, we decided to ignore those stairs during annotation (Figure \ref{fig:anno_res} 1-2. (b)).
 
-Figure \ref{fig:whole-annotation} shows an example of the original maps and their corresponding annotation results. All the white lines are the "edge" class and the remaining black domains are "background". The total annotation task took about 5 weeks of work with 1.5 day/week workload.
+Figure \ref{fig:whole-annotation} shows an example of the original maps and their corresponding annotation results. All the white lines are the "edge" class and the remaining black domains are "background". The total annotation task took about 5 weeks of work with a 1.5 day/week workload.
 
 \begin{figure}[H]
     
@@ -148,30 +148,6 @@ Figure \ref{fig:whole-annotation} shows an example of the original maps and thei
 		\includegraphics[width=1\linewidth]{images/label1.png}  
 		\label{fig:sub-second}
 	\end{subfigure}
-% 	\begin{subfigure}[b]{.48\textwidth}
-% 		% include first image
-% 		\includegraphics[width=1\linewidth]{images/img3.png}  
-% 		\caption{Original maps}
-% 		\label{fig:}
-% 	\end{subfigure}
-% 	\begin{subfigure}[b]{.35\textwidth}
-% 		% include second image
-% 		\includegraphics[width=1\linewidth]{images/label3.png}  
-% 		\caption{Annotation results}
-% 		\label{fig:sub-second}
-% 	\end{subfigure}
-% 	\begin{subfigure}[b]{.35\textwidth}
-% 		% include first image
-% 		\includegraphics[width=1\linewidth]{images/img4.png}  
-% 		\caption{Original maps}
-% 		\label{fig:sub-first}
-% 	\end{subfigure}
-% 	\begin{subfigure}[b]{.35\textwidth}
-% 		% include second image
-% 		\includegraphics[width=1\linewidth]{images/label4.png}  
-% 		\caption{Annotation results}
-% 		\label{fig:sub-second}
-% 	\end{subfigure}
 	
 	\caption{Original maps and their annotation results}
 	\label{fig:whole-annotation}
@@ -180,23 +156,23 @@ Figure \ref{fig:whole-annotation} shows an example of the original maps and thei
 
 
 \section{Semantic segmentation}
-Convolutional neural networks (FCNNs)  have  shown  impressive  performance  for  image  segmentation  tasks  (i.e.,  to  determine  whether  a  pixel  belongs  to  a  certain  object  or  not)\cite{heitzler2020cartographic}. Dataset consists of input images (original maps) and their corresponding binary labels (our annotations) are required to train CNN models. After preprocessing those maps and generate little patches from each map, we can choose appropriate model to get good prediction results that are close enough to our annotation labels. 
+Convolutional neural networks (CNNs)  have shown impressive performance for image segmentation tasks  (i.e.,  to determine whether a pixel belongs to a certain object or not)\cite{heitzler2020cartographic}. Dataset consists of input images (original maps) and their corresponding binary labels (our annotations) are required to train CNN models. After preprocessing those maps and generating little patches from each map, we can choose an appropriate model to get good prediction results that are close enough to our annotation labels. 
 
 \subsection{Map preprocessing}
-Since the size of cropped maps are still too large for GPUs to load, we need to crop patches from those maps and corresponding labels and generate dataset to train our CNN model.
+Since the size of cropped maps are still too large for GPUs to load, we need to crop patches from those maps and corresponding labels and generate a dataset to train our CNN model.
 
-To constitute the dataset for training and prediction, we randomly cut out 300 map patches in each map with size 1024x1024 pixels and got dataset with totally 3,600 patches. Then we randomly divided all the patches into training set, validation set and test set with ratio 7:2:1. Therefore, every annotated map in average cropped 210 patches for training set, 60 patches for validation set and 30 patches for test set.
+To constitute the dataset for training and prediction, we randomly cut out 300 map patches in each map with a size of 1024x1024 pixels and got a dataset with a total of 3,600 patches. Then we randomly divided all the patches into the training set, validation set, and test set with a ratio of 7:2:1. Therefore, every annotated map on average cropped 210 patches for the training set, 60 patches for the validation set, and 30 patches for the test set.
 
-To avoid model over fitting and strengthen the robustness of our model to keep acceptable performance on more cadastre maps, we applied image augmentation on the training set. Before putting each training set image to the model at each training iteration, we randomly transform the image through: 1) 50$\%$ probability to randomly rotate the image with angle range 0 to $\pi$. 2) 50$\%$ probability to vertical flip. 3) 50$\%$ probability to horizontal flip.
+To avoid model overfitting and strengthen the robustness of our model to keep acceptable performance on more cadastre maps, we applied image augmentation on the training set. Before putting each training set image to the model at each training iteration, we randomly transform the image through 1) 50$\%$ probability to randomly rotate the image with an angle range 0 to $\pi$. 2) 50$\%$ probability to vertical flip. 3) 50$\%$ probability to horizontal flip.
 
 
 
 \subsection{Model}
-The segmentation model is based on encoder-decoder architecture. The encoder receive an input image and reduce its image size and increase its number of layers to contain features using methods like convolution and pooling and generate a feature map with lower image size but higher layers. The feature map is then put into the decoder. The decoder is, on the contrary, increase the size of the feature map and reduce its number of layers through convolution and up sampling and finally generate an image with the same shape and number of layer as the input image, which describes the prediction class of every pixel of the input image. 
+The segmentation model is based on encoder-decoder architecture. The encoder receives an input image and reduces its image size and increases its number of layers to contain features using methods like convolution and pooling and generates a feature map with lower image size but higher layers. The feature map is then put into the decoder. The decoder is, on the contrary, increases the size of the feature map and reduces its number of layers through convolution and up sampling, and finally generates an image with the same shape and number of layers as the input image, which describes the prediction class of every pixel of the input image. 
 
 For our segmentation problem, we chose the UNet\cite{ronneberger2015u} architecture with  ResNet\cite{he2016deep} as the encoder.
 
-Figure \ref{fig:unet} shows the idea of initial UNet architecture. We can see that this is a classic encoder-decoder model. The character of UNet structure is that before convolution at each layer of the decoder, the feature map is first concatenated with the corresponding feature map of encoder.
+Figure \ref{fig:unet} shows the idea of initial UNet architecture. We can see that this is a classic encoder-decoder model. The character of the UNet structure is that before convolution at each layer of the decoder, the feature map is first concatenated with the corresponding feature map of the encoder.
 
 \begin{figure}[H]
     \centering
@@ -205,7 +181,7 @@ Figure \ref{fig:unet} shows the idea of initial UNet architecture. We can see th
     \label{fig:unet}
 \end{figure}
 
-Semantic segmentation tasks have greatly benefited from deep models because deeper CNN layers can extract more advanced semantic information\cite{Girshick_2014_CVPR}. But deep models also have degradation problem: when we keep stacking CNN layer, accuracy saturated and then degrades rapidly and is not due to overfitting so only reduce number of parameters in the CNN model cannot solve this problem. ResNet architecture greatly addressed this degradation problem by introducing residual learning and thus can stack more layers and implement deeper CNN models.\cite{he2016deep}. Figure \ref{fig:resnet} illustrates a residual learning block of ResNet. We can see that the residual learning is implemented through "shortcut connections": the output is added to the output of two convolutional layers. 
+Semantic segmentation tasks have greatly benefited from deep models because deeper CNN layers can extract more advanced semantic information\cite{Girshick_2014_CVPR}. But deep models also have a degradation problem: when we keep stacking the CNN layer, accuracy is saturated and then degrades rapidly and is not due to overfitting so only reduce the number of parameters in the CNN model cannot solve this problem. ResNet architecture greatly addressed this degradation problem by introducing residual learning and thus can stack more layers and implement deeper CNN models.\cite{he2016deep}. Figure \ref{fig:resnet} illustrates a residual learning block of ResNet. We can see that the residual learning is implemented through "shortcut connections": the output is added to the output of two convolutional layers. 
 
 \begin{figure}[H]
     \centering
@@ -216,14 +192,14 @@ Semantic segmentation tasks have greatly benefited from deep models because deep
 
 For the segmentation task we chose ResNet101 (101-layer ResNet) as our CNN encoder, and the whole CNN architecture was implemented through a PyTorch\cite{NEURIPS2019_9015} based open-source tool: dhSegment\cite{oliveiraseguinkaplan2018dhsegment}.
 
-Activation function is an indispensable part of the CNN model because it introduces  nonlinear factors and gives model ability to fit complex nonlinear problems in the real life. Sigmoid and rectified linear unit (ReLU) are two classic activation function and have been extensively utilized in the semantic segmentation task. Using sigmoid function may produce gradient dispearence phenomenon, especially when we use deep CNN models, and thus result in bad prediction result. In this project we use ReLU as our activation function. The ReLU function is shown as below.
+The activation function is an indispensable part of the CNN model because it introduces nonlinear factors and gives the model ability to fit complex nonlinear problems in the real life. Sigmoid and rectified linear unit (ReLU) are two classic activation functions and have been extensively utilized in the semantic segmentation task. Using the sigmoid function may produce a gradient disappearance phenomenon, especially when we use deep CNN models, and thus result in bad prediction results. In this project, we use ReLU as our activation function. The ReLU function is shown below.
 
 \begin{equation}
     x = max(0, x)
 \end{equation}
 
 
-We trained our CNN model for 60 epochs with batch size 2, and number of accumulation step 3.  We choose Adam as our learning optimizer an set initial learning rate $5x10^{-5}$ with an exponential decay scheduler with decay factor $\gamma=0.9999$. With the decay scheduler, after each learning step, the learning rate updates and times the decay factor $\gamma$ and thus will slowly reduce with step number growing. Figure \ref{fig:learning_rate} and equation \ref{eq:lr} shows the relationship between learning rate and number of learning steps. The whole training experienced about 50.4k and at the last learning step the learning rate reduced at $3.23x10^{-7}$.
+We trained our CNN model for 60 epochs with batch size 2, and the number of accumulation step 3.  We choose Adam as our learning optimizer a set initial learning rate of $5x10^{-5}$ with an exponential decay scheduler with decay factor $\gamma=0.9999$. With the decay scheduler, after each learning step, the learning rate updates and times the decay factor $\gamma$ and thus will slowly reduce with step number growing. Figure \ref{fig:learning_rate} and equation \ref{eq:lr} shows the relationship between learning rate and number of learning steps. The whole training experienced about 50.4k and at the last learning step the learning rate reduced to $3.23x10^{-7}$.
 
 
 
@@ -240,11 +216,11 @@ We trained our CNN model for 60 epochs with batch size 2, and number of accumula
 \end{figure}
 
 
-We use intersection over union (IoU), precision and recall to quantify the prediction performance, as . After each training epoch, we use the validation set to validate our model and save the model parameter when the MIoU of the validation is higher than the current maximum MIoU.
+We use intersection over union (IoU), precision, and recall to quantify the prediction performance. After each training epoch, we use the validation set to validate our model and save the model parameter when the MIoU of the validation is higher than the current maximum MIoU.
 
 
 \subsection{result}
-After 60 epochs training, we got the model with maximum MIoU at 0.9018, and the IoU of the class "edge" has reached at 0.8080, and precision and recall of "edge" are close to 0.9. Table \ref{tab:my_label} shows the details of the metrics value.
+After 60 epochs of training, we got the model with maximum MIoU at 0.9018, the IoU of the class "edge" has reached 0.8080, and precision and recall of "edge" are close to 0.9. Table \ref{tab:my_label} shows the details of the metrics value.
 
 \begin{table}[htbp]
     \centering
@@ -277,11 +253,11 @@ After 60 epochs training, we got the model with maximum MIoU at 0.9018, and the 
 
 Figure \ref{fig:pre_res} shows some examples of the prediction outputs in the test set. Comparing the ground truth - annotation results (Figure \ref{fig:pre_res} (b)) with the CNN model prediction outputs (Figure \ref{fig:pre_res} (c)) we can observe that the model prediction outputs are nearly identical to the corresponding ground truth, thus the model have a great performance on the test set: it predicted almost all of the road networks, buildings, wharves (Figure \ref{fig:pre_res} 2.(a-c)), rivers (Figure \ref{fig:pre_res} 5.(a-c)) and other annotated objects with high accuracy. 
 
-But as we thought before, those texts overlapping prediction objects indeed result in prediction errors and the overlapped regions are not predicted accurately (Figure \ref{fig:pre_res} 4.(a-c)). Also there are some little circles at some of the road networks, the prediction results have some gaps at the circle location (Figure \ref{fig:pre_res} 2.(a-c), 3.(a-c), 5.(a-c)).
+But as we thought before, those texts' overlapping prediction objects indeed result in prediction errors, and the overlapped regions are not predicted accurately (Figure \ref{fig:pre_res} 4. (a-c)). Also, there are some little circles in some of the road networks, the prediction results have some gaps at the circle location (Figure \ref{fig:pre_res} 2. (a-c), 3. (a-c), 5. (a-c)).
 
 \begin{figure}[H]
     \centering
-    \rotatebox{90}{\scriptsize{~~~~~~~~~~~~~~~~~~1. Image}}
+    \rotatebox{90}{\scriptsize{~~~~~~~~~~~~~~~~~~~~~~~~1. }}
     \begin{subfigure}[b]{.28\textwidth}
 		\begin{minipage}[t]{1\linewidth}
 			\centering
@@ -305,7 +281,7 @@ But as we thought before, those texts overlapping prediction objects indeed resu
  	\vspace{+2mm}
     \setcounter{subfigure}{0}
 	
-	\rotatebox{90}{\scriptsize{~~~~~~~~~~~~~~~~~~1. Image}}
+	\rotatebox{90}{\scriptsize{~~~~~~~~~~~~~~~~~~~~~~~~2. }}
     \begin{subfigure}[b]{.28\textwidth}
 		\begin{minipage}[t]{1\linewidth}
 			\centering
@@ -328,7 +304,7 @@ But as we thought before, those texts overlapping prediction objects indeed resu
 	\vspace{+2mm}
     \setcounter{subfigure}{0}
     
-        \rotatebox{90}{\scriptsize{~~~~~~~~~~~~~~~~~~1. Image}}
+        \rotatebox{90}{\scriptsize{~~~~~~~~~~~~~~~~~~~~~~~~3. }}
     \begin{subfigure}[b]{.28\textwidth}
 		\begin{minipage}[t]{1\linewidth}
 			\centering
@@ -351,7 +327,7 @@ But as we thought before, those texts overlapping prediction objects indeed resu
 	\vspace{+2mm}
     \setcounter{subfigure}{0}
     
-    \rotatebox{90}{\scriptsize{~~~~~~~~~~~~~~~~~~1. Image}}
+    \rotatebox{90}{\scriptsize{~~~~~~~~~~~~~~~~~~~~~~~~4. }}
     \begin{subfigure}[b]{.28\textwidth}
 		\begin{minipage}[t]{1\linewidth}
 			\centering
@@ -379,7 +355,7 @@ But as we thought before, those texts overlapping prediction objects indeed resu
 	
  
     % 第二行图片展示
-    \rotatebox{90}{\scriptsize{~~~~~~~~~2. Annotation result}}
+    \rotatebox{90}{\scriptsize{~~~~~~~~~~~~~~~~~~~~~~~~5. }}
     \begin{subfigure}[b]{.28\textwidth}
         % 左标题2
 		
@@ -413,7 +389,7 @@ But as we thought before, those texts overlapping prediction objects indeed resu
 \subsection{Prediction map reconstitution}
 Now we have a good performance model to predict “edges” from 1024x1024-size patches. Now we want to reconstitute the prediction result of the whole map for polygon recovery in the next chapter.
 
-We patched these 12 annotated maps to size 1024x1024 with overlap 200 and put into the trained model to get patches of prediction results, then we reconstitute those predicted patches to the whole prediction map. For the overlapping domain we averaged the prediction probabilities and got the final probability. Figure \ref{fig:original-reconstitution} shows an example of the reconstitution result. We can see that the CNN model well predicted the original map.
+We patched these 12 annotated maps to size 1024x1024 with an overlap of 200 and put them into the trained model to get patches of prediction results, then we reconstitute those predicted patches to the whole prediction map. For the overlapping domain, we averaged the prediction probabilities and got the final probability. Figure \ref{fig:original-reconstitution} shows an example of the reconstitution result. We can see that the CNN model well predicted the original map.
 
 \begin{figure}[H]
     \centering
@@ -463,7 +439,7 @@ We patched these 12 annotated maps to size 1024x1024 with overlap 200 and put in
 \end{figure}
 
 
-To test the robustness of our trained model, We also predicted and reconstituted additional 12 unannotated maps and all of the results have shown great prediction performance. Two examples of the prediction outputs is shown in Figure \ref{fig:additional-reconstitution}. The results indicate that the CNN model have good robustness and have good performance on maps that did not exist at the training step and validation step before, so we can believe that the CNN model we trained can well predict the whole cadastre consisting 300 historical maps of Lausanne. Next we will use those reconstitution map predictions to begin polygon recovery process.
+To test the robustness of our trained model, We also predicted and reconstituted additional 12 unannotated maps and all of the results have shown great prediction performance. Two examples of the prediction outputs are shown in Figure \ref{fig:additional-reconstitution}. The results indicate that the CNN model has good robustness and has good performance on maps that did not exist at the training step and validation step before, so we can believe that the CNN model we trained can well predict the whole cadastre consisting of 300 historical maps of Lausanne. Next, we will use those reconstitution map predictions to begin the polygon recovery process.
 
 \begin{figure}[H]
     \centering
@@ -505,19 +481,19 @@ To test the robustness of our trained model, We also predicted and reconstituted
 
 
 \section{Polygon Recovery}
-In the semantic segmentation chapter we trained CNN model to predict edges from map patches and reconstituted prediction results of each map. In this chapter we will find a automatic computer vision method to recover polygons from these reconstitution prediction outputs. With the polygon-recovered results people can just manual-label the polygons to generate vector images, like "shapefile (.shp)" format, in the future.
+In the semantic segmentation chapter, we trained the CNN model to predict edges from map patches and reconstituted the prediction results of each map. In this chapter, we will find an automatic computer vision method to recover polygons from these reconstitution prediction outputs. With the polygon-recovered results, people can just manual-label the polygons to generate vector images, like the "shapefile (.shp)" format, in the future.
 
-Polygon recovery is to judge whether a region should be split to little regions and determine boundaries of the region if we decide to split, and those determined boundaries is the boundaries of each recovered polygon. The main difficulty of polygon recovery is that not all of the "edges" in the reconstituted prediction maps are closed: There may be some gaps in a polygon boundaries due to: 1) The polygon is at the edge of the cadastre map. 2) The lines themselves in the map are not intersected in the map and the polygons are not closed in these original maps. 3) There are some gaps in a line of prediction result because of prediction error, and maybe the prediction is influenced by text descriptions in the map which overlap the prediction objects. (Figure \ref{fig:pre_res}). 
+Polygon recovery is to judge whether a region should be split into little regions and determine the boundaries of the region if we decide to split, and those determined boundaries are the boundaries of each recovered polygon. The main difficulty of polygon recovery is that not all of the "edges" in the reconstituted prediction maps are closed: There may be some gaps in a polygon boundary due to: 1) The polygon is at the edge of the cadastre map. 2) The lines themselves in the map are not intersected in the map and the polygons are not closed in these original maps. 3) There are some gaps in a line of prediction result because of prediction error, and maybe the prediction is influenced by text descriptions in the map which overlap the prediction objects. (Figure \ref{fig:pre_res}). 
 
-To finish the polygon recovery task, we tried two computer vision methods: watershed transformation and Felzenswalb algorithm, both of them are provided in the Python library "skimage.segmentation"\cite{van2014scikit}. The result of both algorithms are shown in Figure \ref{fig:watershed1}, \ref{fig:watershed2}.
+To finish the polygon recovery task, we tried two computer vision methods: watershed transformation and the Felzenswalb algorithm, both of them are provided in the Python library in scikit-image\cite{van2014scikit} "skimage.segmentation". The result of both algorithms are shown in Figure \ref{fig:watershed1}, \ref{fig:watershed2}.
 
 \subsection{Watershed transformation}
 
-Watershed transformation algorithm is a morphological based tool for image segmentation which is originally proposed by Digabel and Lantuejoul (1977) and later improved by Li et. al. (2003)\cite{khiyal2009modified, li2003improved}. The idea of watershed tranformation is that it think of an image as a topographic map. Firstly we should choose some "catchment basins" in the map,  As water is poured at those "catchment basins", we should built dams where water from different catchment basins can meet to avoid catchments basins connecting and merging. Finally, those lines of the watershed are defined by catchment areas divided by those dams at the highest level where water can meet together and the watershed lines are regarded as boundaries of segmented regions, and thus the polygon recovering is finished.
+Watershed transformation algorithm is a morphological-based tool for image segmentation which is originally proposed by Digabel and Lantuejoul (1977) and later improved by Li et. al. (2003)\cite{khiyal2009modified, li2003improved}. The idea of watershed transformation is that it thinks of an image as a topographic map. Firstly we should choose some "catchment basins" on the map,  As water is poured at those "catchment basins", we should build dams where water from different catchment basins can meet to avoid catchment basins connecting and merging. Finally, those lines of the watershed are defined by catchment areas divided by those dams at the highest level where water can meet together and the watershed lines are regarded as boundaries of segmented regions, and thus the polygon recovering is finished.
 
-The key point of the watershed transformation is how to choose these "catchment basins", which is usually local lowest points (local minimum points of gray value) of the map. We can change the distance of determining local minimum points to change the number of the "catchment basins". If the determining distance is to small, there will be too many basins so that too many polygons are segmented, and a lot of polygons are necessary. On the contrary, if the determining distance is too large, number of basins is not large enough and thus polygons cannot be well segmented. For different kind of maps, different distance should be set for best watershed performance.  
+The key point of the watershed transformation is how to choose these "catchment basins", which are usually the local lowest points (local minimum points of gray value) of the map. We can change the distance of determining local minimum points to change the number of the "catchment basins". If the determining distance is too small, there will be too many basins so that too many polygons are segmented, and a lot of polygons are necessary. On the contrary, if the determining distance is too large, the number of basins is not large enough and thus polygons cannot be well segmented. For different kinds of maps, different distances should be set for the best watershed performance.  
 
-Figure \ref{fig:watershed1}, \ref{fig:watershed2} shows the result of the watershed transformation using different minimum basin distances of two different kind of maps. Comparing the results of the two maps, we can observe that they have different best minimum basin distances (min\_distance=30 for Figure \ref{fig:watershed1}, min\_distance=10 for Figure \ref{fig:watershed2}). When the distance is set too small, there will be too many catchment basins and so that too many polygons are segmented, and some big regions will contain many small regions with dense parallel boundaries, horizontal or vertical (Figure \ref{fig:watershed1} (c), \ref{fig:watershed2} (c)). However, when minimum distance is too large, polygons are not segmented adequately and there exists a lot of connected regions which should be split (\ref{fig:watershed1} (e), buildings at the center of the map in Figure \ref{fig:watershed1} (e)). The results of watershed transformation are acceptable and reasonable when minimum distance of catchment basin is appropriate.
+Figure \ref{fig:watershed1}, \ref{fig:watershed2} shows the result of the watershed transformation using different minimum basin distances of two different kinds of maps. Comparing the results of the two maps, we can observe that they have different best minimum basin distances (min\_distance=30 for Figure \ref{fig:watershed1}, min\_distance=10 for Figure \ref{fig:watershed2}). When the distance is set too small, there will be too many catchment basins so that too many polygons are segmented, and some big regions will contain many small regions with dense parallel boundaries, horizontal or vertical (Figure \ref{fig:watershed1} (c), \ref{fig:watershed2} (c)). However, when the minimum distance is too large, polygons are not segmented adequately and there exists a lot of connected regions which should be split (\ref{fig:watershed1} (e), buildings at the center of the map in Figure \ref{fig:watershed1} (e)). The results of the watershed transformation are acceptable and reasonable when the minimum distance of the catchment basin is appropriate.
 
 
 \subsection{Felzenswalb algorithm}
@@ -603,7 +579,7 @@ Figure \ref{fig:watershed1} shows the result of Felzenswalb. We can observe that
 		\caption{CNN Prediction outputs}
 	\end{subfigure}
 	
-	\rotatebox{90}{\small{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~1. Watershed outputs}}
+	\rotatebox{90}{\small{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~1. Watershed outputs}}
 	\begin{subfigure}[b]{.3\textwidth}
 		% include first image
 		\centering
@@ -623,7 +599,7 @@ Figure \ref{fig:watershed1} shows the result of Felzenswalb. We can observe that
 		\caption{min\_distance=20, \\ 28 basins.}
 	\end{subfigure}
 	
-	\rotatebox{90}{\small{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~2. Felzenswalb outputs}}
+	\rotatebox{90}{\small{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~2. Felzenswalb outputs}}
 	\begin{subfigure}[b]{.3\textwidth}
 		% include first image
 		\centering
@@ -651,15 +627,15 @@ Figure \ref{fig:watershed1} shows the result of Felzenswalb. We can observe that
 
 
 \section{Discussion}
-The result of the project show that automatic vectorization of cadastre is feasible through processes: 1) annotation 2) semantic segmentation 3) polygon recovery. With this pipeline a lot of labor cost and time cost can be saved. 
+The result of the project shows that automatic vectorization of cadastre is feasible through processes: 1) annotation 2) semantic segmentation 3) polygon recovery. With this pipeline, a lot of labor costs and time costs can be saved. 
 
-For the map annotation part, the rule of annotating is not clear, and different people may have different judgement criteria and thus will produce different annotation results, which may result in different semantic segmentation and vectorization outputs. When the dataset is too large, sometimes we have to let more people to do the annotation task. In this situation it would be better to have a full discussion about the rules of labeling the objects, It would be a good idea to first annotate one of the map for everyone, and then they can try to reach consensus on every annotating detail. With consistent rules, they can make the dataset with higher quality and accuracy to fit their goal. 
+For the map annotation part, the rule of annotating is not clear, and different people may have different judgment criteria and thus will produce different annotation results, which may result in different semantic segmentation and vectorization outputs. When the dataset is too large, sometimes we have to let more people do the annotation task. In this situation it would be better to have a full discussion about the rules of labeling the objects, It would be a good idea to first annotate one of the maps for everyone, and then they can try to reach a consensus on every annotating detail. With consistent rules, they can make the dataset with higher quality and accuracy to fit their goal. 
 
-Regarding the semantic segmentation performance, UNet architecture with ResNet101 as the encoder shows good ability to solve the cadastre map segmentation problem and the vast majority of "edges" are well-predicted with high quality (MIoU=0.9018, IoU of "edge"=0.808, Precision of "edge"=0.8816, Recall of "edge"=0.9063). We also randomly chose additional 12 maps from the cadastre without annotating and training for the model to predict. After "patching-predicting-reconstituting" processes, the prediction outputs have shown great inference to all of these additional 12 maps, which indicate that the model performed strong robustness for tthhe whole cadasre dataset. But we also found that the model performs unsatisfactory in the situation that prediction objects are overlapped with text descriptions. We have to admit that those overlapped texts indeed interfere with the prediction results, but we could try to adjust the detail of the model structure or dataset processing method to better solve this problem. For example, we can try to change the activation function and replace our "ReLU" function with "Leaky ReLU" or other function, or we can change the data augmentation method and add more image transform like gamma transformation, Gaussian blur, etc. Another way to suit the text overlapping situation is that we can consciously add patches of this situation to the model for training. In the future we can try thost methods mentioned above to improve the performance of semantic performance.  
+Regarding the semantic segmentation performance, UNet architecture with ResNet101 as the encoder shows a good ability to solve the cadastre map segmentation problem, and the vast majority of "edges" are well-predicted with high quality (MIoU=0.9018, IoU of "edge"=0.808, Precision of "edge"=0.8816, Recall of "edge"=0.9063). We also randomly chose additional 12 maps from the cadastre without annotating and training for the model to predict. After "patching-predicting-reconstituting" processes, the prediction outputs have shown great inference to all of these additional 12 maps, which indicate that the model performed strong robustness for the whole cadastre dataset. But we also found that the model performs unsatisfactorily in the situation where prediction objects are overlapped with text descriptions. We have to admit that those overlapped texts indeed interfere with the prediction results, but we could try to adjust the detail of the model structure or dataset processing method to better solve this problem. For example, we can consciously add patches containing the overlapping problem in the dataset to improve the ability of the model to handle this situation. Also, we can try to change the data augmentation method and add more image transformations like gamma transformation, Gaussian blur, etc to strengthen the robustness of the model. 
 
-Both watershed tranformation and Felzenswalb algorithm have shown acceptable results for polygon recovery, but both of these algorithms have some common limitations. Firstly, both of them have a key parameter to set by us, which rely more on our experience (minimum catchment basin distance for watershed transformation, observation scale for Felzenswalb), and it is hard to quickly set suitable parameter to segment polygons of the map. Secondly, different maps have different suitable parameters. if we use either of the two algorithm when processing the whole cadastre with more than 300 maps, maybe we have to manually adjust algorithm parameter for each map to get a great polygon recovery result, and this will cost a lot of time for researchers and could not meet our final goal of "automatic vectorization" and beacuse the limiting time, we do not have enough time to deep in this domain. Since these paramters have relationship with the dense of the map boundaries, the denser of the map: the bigger the parameter (minimum distance for watershed, observing scale for Felzenswalb should be set), in the future it is possiable to explore methods to automatically choose the key parameters of these algorithms to suit majority of the maps to save time for researchers. And more polygon recovering algorithms should be experimented to find a better method to segment polygons in cadastre maps.
+Both watershed transformation and the Felzenswalb algorithm have shown acceptable results for polygon recovery, but both of these algorithms have some common limitations. Firstly, both of them have a key parameter to set by us, which relies more on our experience (minimum catchment basin distance for watershed transformation, observation scale for Felzenswalb), and it is hard to quickly set a suitable parameter to segment polygons of the map. Secondly, different maps have different suitable parameters. if we use either of the two algorithms when processing the whole cadastre with more than 300 maps, maybe we have to manually adjust the algorithm parameter for each map to get a great polygon recovery result, and this will cost a lot of time for researchers and could not meet our final goal of "automatic vectorization" and because the limiting time, we do not have enough time to deep in this domain. Since these parameters have a relationship with the dense of the map boundaries, the denser the map: the bigger the parameter (minimum distance for the watershed, observing scale for Felzenswalb should be set), in the future it is possible to explore methods to automatically choose the key parameters of these algorithms to suit the majority of the maps to save time for researchers. And more polygon recovering algorithms should be experimented with to find a better method to segment polygons in cadastre maps.
 
-Finally, we think that to achieve the automatic vectorization goal, we need to manually label the polygon recovery outputs with particular software to get the vector image, like "shapefile (.shp)" format, for example. But maybe there exist methods to automatically tranfer polygon recovery output or CNN prediction results to the vector image result. If this process achieved, we can really achieve the automatic vectorization goal: automatically get the vector image for the original cadastre map.
+Finally, we think that to achieve the automatic vectorization goal, we need to manually label the polygon recovery outputs with particular software to get the vector image like the "shapefile (.shp)" format for example.  But maybe there exist methods to automatically transfer polygon recovery output or CNN prediction results to the vector image result. In the future, maybe we can try to make use of the contour finding algorithm provided in the "scikit-image" library to achieve this process, and thus we can eventually achieve the automatic vectorization goal: automatically get the vector image for the original cadastre map.
 
 
 \newpage
